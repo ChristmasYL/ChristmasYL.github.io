@@ -5,7 +5,7 @@ const input = document.getElementById("codeInput");
 const error = document.getElementById("errorText");
 
 // 👉 ЗАДАЙ КОД ЗДЕСЬ
-const CORRECT_CODE = "31861"; // пример
+const CORRECT_CODE = "90538"; // пример
 
 openBtn.onclick = () => {
     codeBox.style.display = "block";
@@ -18,3 +18,4 @@ checkBtn.onclick = () => {
         error.style.display = "block";
     }
 };
+
