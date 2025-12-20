@@ -13,9 +13,10 @@ openBtn.onclick = () => {
 
 checkBtn.onclick = () => {
     if (input.value.trim().toUpperCase() === CORRECT_CODE) {
-        window.location.href = "trees.html"; // следующая страница
+        window.location.href = "foto.html"; // следующая страница
     } else {
         error.style.display = "block";
     }
 };
+
 
