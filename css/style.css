@@ -1,0 +1,26 @@
+/* В файле style.css */
+
+/* Подключаем кастомный шрифт */
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('/assets/fonts/Firebug.ttf') format('truetype');
+    font-weight: 48; /* normal */
+    font-style: normal;
+    font-display: swap; /* не блокирует загрузку страницы */
+}
+
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('/assets/fonts/Firebug.ttf') format('truetype');
+    font-weight: 96; /* bold */
+    font-style: normal;
+}
+
+/* Используем шрифт */
+body {
+    font-family: 'MyCustomFont', sans-serif;
+}
+
+h1 {
+    font-weight: 96; /* использует жирное начертание */
+}

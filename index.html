@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все только начинается ❤️</title>
+    <style>
+        /* Подключаем кастомный шрифт */
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('/assets/fonts/Firebug.ttf') format('truetype');
+            font-weight: 48;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('/assets/fonts/Firebug.ttf') format('truetype');
+            font-weight: 96;
+            font-style: normal;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="card-content">
+            <h1>Ну здравствуй 👋</h1>
+            <p>Чтобы получить подарок, тебе придётся пройти небольшой квест
+                <span class="blink-emoji">😉</span>
+            </p>
+        </div>
+ <button class="christmas-btn gradient-btn">
+            <span class="btn-text">Начать путешествие</span></button>
+    </div>
+<body>
+    <div class="btn" href="riddle1.html"> 
+      <link rel="stylesheet" href="css/stylebutton.css">
+    </head>
+
+    <script src="/js/scriptbutton.js"></script>
+
+    <script>
+        // Добавляем обработчик клика на кнопку
+        document.querySelector('.christmas-btn gradient-btn').addEventListener('click', function() {
+            alert('Путешествие начинается! 🎁');
+            // Здесь можно добавить переход на другую страницу или другую логику
+            // window.location.href = 'next-page.html';
+        });
+    </script>
+</body>
+</html>

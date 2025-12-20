@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Матрица: Рождественская загадка</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+
+        /* Объявление шрифта с поддержкой OpenType и TrueType */
+        @font-face {
+            font-family: 'MatrixFont';
+            src: url('/assets/fonts/ball.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        /* Резервный локальный шрифт */
+        @font-face {
+            font-family: 'LocalMatrix';
+            src: local('Courier New'), 
+                 local('Consolas'),
+                 local('Lucida Console');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'MatrixFont', 'Roboto Mono', monospace;
+            background-color: #000;
+            color: #0f0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 800px;
+        }
+        
+        .frame {
+            background-color: rgba(0, 20, 0, 0.7);
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 0, 0.7),
+                inset 0 0 20px rgba(0, 255, 0, 0.3);
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #0f0, transparent);
+            animation: scanline 3s linear infinite;
+        }
+        
+        h1 {
+            font-family: 'MatrixFont', 'Roboto Mono', monospace, 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: #0f0;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+            letter-spacing: 2px;
+        }
+        
+        .text {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #cfc;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        
+        .highlight {
+            color: #ff0;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(255, 255, 0, 0.7);
+        }
+        
+        .hint {
+            font-size: 1.1rem;
+            color: #9f9;
+            font-style: italic;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed #0f0;
+        }
+        
+        .symbols {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .symbol {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            transition: all 0.3s;
+            cursor: pointer;
+            background-color: rgba(0, 30, 0, 0.5);
+        }
+        
+        .symbol:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+            background-color: rgba(0, 50, 0, 0.7);
+        }
+        
+        .wrong-symbol {
+            color: #f00;
+            border-color: #f00;
+            animation: pulse 2s infinite;
+        }
+        
+        .wrong-symbol:hover {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+            background-color: rgba(50, 0, 0, 0.7);
+        }
+        
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        /* Стили для секции ввода кода */
+.code-section {
+    margin-top: 40px; /* Отступ сверху */
+    text-align: center;
+}
+
+#showCodeInput {
+    background-color: rgba(0, 30, 0, 0.7);
+    color: #0ff; /* Голубой цвет для выделения */
+    border: 1px solid #0ff;
+    padding: 12px 25px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+#showCodeInput:hover {
+    background-color: rgba(0, 50, 50, 0.9);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+    transform: translateY(-2px);
+}
+
+/* Контейнер для ввода кода (изначально скрыт) */
+.code-input-container {
+    margin-top: 25px;
+    padding: 25px;
+    background-color: rgba(0, 20, 20, 0.8);
+    border: 1px solid #0ff;
+    border-radius: 8px;
+    display: none; /* Скрыто по умолчанию */
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+#accessCode {
+    background-color: rgba(0, 10, 10, 0.9);
+    color: #0ff;
+    border: 1px solid #0ff;
+    padding: 12px 20px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.2rem;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+#accessCode:focus {
+    outline: none;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+    border-color: #0ff;
+}
+
+#submitCode {
+    background-color: rgba(0, 40, 40, 0.9);
+    color: #0ff;
+    border: 1px solid #0ff;
+    padding: 10px 25px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+#submitCode:hover {
+    background-color: rgba(0, 60, 60, 0.9);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+}
+
+.code-message {
+    margin-top: 20px;
+    font-size: 1rem;
+    min-height: 24px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgba(0, 10, 10, 0.7);
+}
+
+.code-success {
+    color: #0f0;
+    border: 1px solid #0f0;
+}
+
+.code-error {
+    color: #f00;
+    border: 1px solid #f00;
+}
+
+        button {
+            background-color: rgba(0, 30, 0, 0.7);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 20px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 3px;
+        }
+        
+        button:hover {
+            background-color: rgba(0, 50, 0, 0.9);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+        
+        select {
+            background-color: rgba(0, 30, 0, 0.7);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px 10px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            border-radius: 3px;
+            min-width: 150px;
+        }
+        
+        .font-status {
+            font-size: 0.8rem;
+            color: #9f9;
+            margin-top: 5px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .text { font-size: 1.1rem; }
+            .frame { padding: 25px; }
+            .symbol { width: 50px; height: 50px; font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    
+    <div class="container">
+        <div class="frame">
+            <h1>РОЖДЕСТВЕНСКАЯ ЕЛЬ</h1>
+            <div class="text">
+                <p>Одним из главных символов рождества является рождественская ель, и конечно же ее принято украшать.</p>
+                <p>Так вот, найди украшение, не вписывающееся туда, и следуй по подсказке внутри.</p>
+           
+                <!-- Добавить этот блок после блока .controls -->
+            <div class="code-section">
+                <button id="showCodeInput">Ввести код для перехода</button>
+                    <div id="codeInputContainer" class="code-input-container">
+                    <input type="text" id="accessCode" placeholder="Введите код доступа" maxlength="10">
+                <button id="submitCode">Проверить код</button>
+            <div id="codeMessage" class="code-message"></div>
+        </div>
+    </div>
+    
+
+
+    <script>
+
+        // Обработчики для ввода кода доступа
+const showCodeInputBtn = document.getElementById('showCodeInput');
+const codeInputContainer = document.getElementById('codeInputContainer');
+const accessCodeInput = document.getElementById('accessCode');
+const submitCodeBtn = document.getElementById('submitCode');
+const codeMessage = document.getElementById('codeMessage');
+
+// Правильный код для перехода (можно изменить)
+const CORRECT_CODE = "26139";
+
+// Показать/скрыть поле ввода кода
+showCodeInputBtn.addEventListener('click', function() {
+    const isVisible = codeInputContainer.style.display === 'block';
+    codeInputContainer.style.display = isVisible ? 'none' : 'block';
+    
+    if (!isVisible) {
+        // Фокусируемся на поле ввода при открытии
+        setTimeout(() => {
+            accessCodeInput.focus();
+        }, 100);
+        
+        // Анимация появления
+        codeInputContainer.style.opacity = '0';
+        codeInputContainer.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            codeInputContainer.style.transition = 'all 0.5s ease';
+            codeInputContainer.style.opacity = '1';
+            codeInputContainer.style.transform = 'translateY(0)';
+        }, 10);
+        
+        this.textContent = 'Скрыть поле ввода кода';
+    } else {
+        this.textContent = 'Ввести код для перехода';
+    }
+});
+
+// Проверка кода
+submitCodeBtn.addEventListener('click', function() {
+    const enteredCode = accessCodeInput.value.trim();
+    
+    if (!enteredCode) {
+        showCodeMessage('Пожалуйста, введите код', 'error');
+        return;
+    }
+    
+    if (enteredCode === CORRECT_CODE) {
+        showCodeMessage('Код принят! Перенаправляем на следующую страницу...', 'success');
+        
+        // Эффект успешного ввода
+        codeInputContainer.style.borderColor = '#0f0';
+        codeInputContainer.style.boxShadow = '0 0 25px rgba(0, 255, 0, 0.6)';
+        
+        // Перенаправление через 2 секунды
+        setTimeout(() => {
+        setTimeout(function() {
+            window.location.href = "candle.html";
+        }, 2000);
+
+
+            // Сброс состояния через 3 секунды
+            setTimeout(() => {
+                accessCodeInput.value = '';
+                codeInputContainer.style.borderColor = '#0ff';
+                codeInputContainer.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.4)';
+                codeMessage.textContent = '';
+            }, 3000);
+        }, 2000);
+    } else {
+        showCodeMessage('Неверный код. Попробуйте еще раз.', 'error');
+        
+        // Эффект ошибки
+        codeInputContainer.style.borderColor = '#f00';
+        codeInputContainer.style.boxShadow = '0 0 25px rgba(255, 0, 0, 0.6)';
+        
+        // Сбросить эффект через 1.5 секунды
+        setTimeout(() => {
+            codeInputContainer.style.borderColor = '#0ff';
+            codeInputContainer.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.4)';
+        }, 1500);
+        
+        // Сбросить поле ввода
+        accessCodeInput.value = '';
+        accessCodeInput.focus();
+    }
+});
+
+// Обработка нажатия Enter в поле ввода
+accessCodeInput.addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+        submitCodeBtn.click();
+    }
+});
+
+// Функция для отображения сообщений
+function showCodeMessage(message, type) {
+    codeMessage.textContent = message;
+    codeMessage.className = 'code-message';
+    
+    if (type === 'success') {
+        codeMessage.classList.add('code-success');
+    } else if (type === 'error') {
+        codeMessage.classList.add('code-error');
+    }
+    
+    // Автоматическое скрытие сообщения через 5 секунд
+    if (type === 'error') {
+        setTimeout(() => {
+            codeMessage.textContent = '';
+            codeMessage.className = 'code-message';
+        }, 5000);
+    }
+}
+
+// Добавляем анимацию при загрузке для кнопки ввода кода
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        showCodeInputBtn.style.transition = 'all 0.5s ease';
+        showCodeInputBtn.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.7)';
+        
+        setTimeout(() => {
+            showCodeInputBtn.style.boxShadow = '0 0 10px rgba(0, 255, 255, 0.5)';
+        }, 1000);
+    }, 2000);
+});
+
+        // Настройки эффекта Matrix
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Устанавливаем размер canvas равным размеру окна
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Кастомные символы для эффекта матрицы
+        // Символы для эффекта "Матрицы" (кодовая капля)
+        const matrixSymbols = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+        const latinSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const cyrillicSymbols = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        const numbers = "0123456789";
+        const specialSymbols = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
+        const matrixCodeSymbols = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ";
+        
+        // Комбинированный набор символов
+        let currentSymbolSet = matrixSymbols + latinSymbols + cyrillicSymbols + numbers + matrixCodeSymbols;
+        const symbolsArray = currentSymbolSet.split("");
+        
+        const fontSize = 25;
+        let columns = canvas.width / fontSize;
+        
+        // Массив для отслеживания позиции каждого столбца
+        const drops = [];
+        
+        // Инициализация капель
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.floor(Math.random() * canvas.height / fontSize) * fontSize;
+        }
+        
+        // Цвета для эффекта
+        let colors = [
+            {main: '#0f0', name: 'Зеленый матрицы', trail: 'rgba(0, 255, 0, 0.1)'},
+       ];
+        
+        let currentColor = 0;
+        let speed = 45; // скорость анимации (кадры в секунду)
+        let density = 1; // плотность символов (1 - нормальная, 2 - двойная)
+        
+        // Текущий шрифт
+        let currentFont = "MatrixFont";
+        let availableFonts = new Set();
+        
+        // Функция для проверки доступности шрифта
+        function checkFontAvailability(fontName) {
+            return new Promise((resolve) => {
+                // Используем Canvas для проверки ширины текста с разными шрифтами
+                const testString = "mmmmmmmmmmlli";
+                const baseFont = "monospace";
+                
+                ctx.font = `20px ${baseFont}`;
+                const baseWidth = ctx.measureText(testString).width;
+                
+                ctx.font = `20px "${fontName}", ${baseFont}`;
+                const testWidth = ctx.measureText(testString).width;
+                
+                // Шрифт считается доступным, если ширина текста отличается от базовой
+                resolve(testWidth !== baseWidth);
+            });
+        }
+        
+        // Функция для проверки всех шрифтов
+        async function checkAvailableFonts() {
+            const fontOptions = ["MatrixFont", "DigitalMatrix", "LocalMatrix", "'Roboto Mono', monospace", "'Courier New', monospace"];
+            fontStatus.textContent = "Проверка доступности шрифтов...";
+            
+            for (const font of fontOptions) {
+                try {
+                    const isAvailable = await checkFontAvailability(font);
+                    if (isAvailable) {
+                        availableFonts.add(font);
+                    }
+                } catch (e) {
+                    console.log(`Шрифт ${font} недоступен: ${e.message}`);
+                }
+            }
+            
+            // Обновляем список в select
+            const fontSelect = document.getElementById('fontSelect');
+            const currentValue = fontSelect.value;
+            
+            // Удаляем все опции
+            while (fontSelect.options.length > 0) {
+                fontSelect.remove(0);
+            }
+            
+            // Добавляем только доступные шрифты
+            for (const font of fontOptions) {
+                if (availableFonts.has(font) || font === "MatrixFont") { // MatrixFont всегда показываем
+                    const option = document.createElement('option');
+                    option.value = font;
+                    
+                    // Красивые названия для шрифтов
+                    if (font === "MatrixFont") option.textContent = "Matrix Font (локальный)";
+                    else if (font === "DigitalMatrix") option.textContent = "Digital Matrix";
+                    else if (font === "LocalMatrix") option.textContent = "Системный моноширинный";
+                    else if (font === "'Roboto Mono', monospace") option.textContent = "Roboto Mono";
+                    else if (font === "'Courier New', monospace") option.textContent = "Courier New";
+                    
+                    fontSelect.appendChild(option);
+                }
+            }
+            
+            // Восстанавливаем выбранное значение
+            if (Array.from(fontSelect.options).some(opt => opt.value === currentValue)) {
+                fontSelect.value = currentValue;
+            } else if (fontSelect.options.length > 0) {
+                fontSelect.value = fontSelect.options[0].value;
+                currentFont = fontSelect.value;
+            }
+            
+            fontStatus.textContent = `Доступно шрифтов: ${fontSelect.options.length}. Текущий: ${fontSelect.options[fontSelect.selectedIndex].textContent}`;
+            fontStatus.style.color = '#0f0';
+        }
+        
+        // Функция отрисовки капель
+        function drawMatrix() {
+            // Затемняем фон для эффекта следа
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Устанавливаем цвет текста
+            ctx.fillStyle = colors[currentColor].main;
+            ctx.font = `${fontSize}px ${currentFont}, 'Courier New', monospace`;
+            ctx.textBaseline = 'top';
+            
+            // Отрисовываем символы
+            for (let i = 0; i < drops.length; i += density) {
+                // Случайный символ
+                const text = symbolsArray[Math.floor(Math.random() * symbolsArray.length)];
+                
+                // Отрисовываем символ
+                ctx.fillText(text, i * fontSize, drops[i]);
+                
+                // Сдвигаем каплю вниз
+                drops[i] += fontSize / 20;
+                
+                // Если капля вышла за пределы экрана, возвращаем её наверх
+                if (drops[i] > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+            }
+        }
+        
+        // Анимация
+        function animate() {
+            drawMatrix();
+            setTimeout(() => {
+                requestAnimationFrame(animate);
+            }, 1000 / speed);
+        }
+        
+        // Запуск анимации
+        animate();
+        
+        // Обработчики событий для кнопок
+        document.getElementById('speedBtn').addEventListener('click', function() {
+            speed = speed === 30 ? 60 : 30;
+            this.textContent = speed === 30 ? 'Ускорить матрицу' : 'Замедлить матрицу';
+            fontStatus.textContent = `Скорость: ${speed} кадров/сек. Текущий шрифт: ${document.getElementById('fontSelect').options[document.getElementById('fontSelect').selectedIndex].textContent}`;
+        });
+        
+        document.getElementById('colorBtn').addEventListener('click', function() {
+            currentColor = (currentColor + 1) % colors.length;
+            
+
+            // Меняем цвет текста
+            const textElements = document.querySelectorAll('.text, .hint');
+            textElements.forEach(el => {
+                el.style.color = currentColorObj.main === '#ff0' ? '#ffc' : 
+                                currentColorObj.main === '#f00' ? '#fcc' :
+                                currentColorObj.main === '#fff' ? '#fff' : '#cfc';
+            });
+            
+            fontStatus.textContent = `Цвет: ${currentColorObj.name}. Текущий шрифт: ${document.getElementById('fontSelect').options[document.getElementById('fontSelect').selectedIndex].textContent}`;
+        });
+        
+        document.getElementById('densityBtn').addEventListener('click', function() {
+            density = density === 1 ? 2 : 1;
+            this.textContent = density === 1 ? 'Увеличить плотность' : 'Уменьшить плотность';
+            
+            // Пересчитываем столбцы при изменении плотности
+            columns = Math.floor(canvas.width / fontSize) * density;
+            
+            // Обновляем массив drops
+            while (drops.length < columns) {
+                drops.push(Math.floor(Math.random() * canvas.height / fontSize) * fontSize);
+            }
+            
+            while (drops.length > columns) {
+                drops.pop();
+            }
+            
+            fontStatus.textContent = `Плотность: ${density === 1 ? 'нормальная' : 'высокая'}. Текущий шрифт: ${document.getElementById('fontSelect').options[document.getElementById('fontSelect').selectedIndex].textContent}`;
+        });
+        
+        // Обработчик выбора шрифта
+        document.getElementById('fontSelect').addEventListener('change', function() {
+            currentFont = this.value;
+            fontStatus.textContent = `Шрифт изменен на: ${this.options[this.selectedIndex].textContent}`;
+            fontStatus.style.color = '#0f0';
+        });
+        
+        // Находим неправильный символ (паук) и добавляем обработчик
+        const wrongSymbol = document.querySelector('.symbol:nth-child(5)');
+        wrongSymbol.classList.add('wrong-symbol');
+        
+        wrongSymbol.addEventListener('click', function() {
+            alert('Правильно! Паук не является традиционным рождественским украшением.\n\nПодсказка: "Посмотри на северную звезду, она укажет путь к следующей подсказке."');
+            
+            // Эффект "взрыва" символов
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const symbol = symbolsArray[Math.floor(Math.random() * symbolsArray.length)];
+                    
+                    ctx.fillStyle = '#f00';
+                    ctx.font = `${fontSize}px ${currentFont}, 'Courier New', monospace`;
+                    ctx.fillText(symbol, x, y);
+                    
+                    setTimeout(() => {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                        ctx.fillRect(x, y, fontSize, fontSize);
+                    }, 100);
+                }, i * 20);
+            }
+        });
+        
+        // Добавляем обработчики для всех символов
+        const allSymbols = document.querySelectorAll('.symbol');
+        allSymbols.forEach((symbol, index) => {
+            if (index !== 4) { // кроме паука
+                symbol.addEventListener('click', function() {
+                    this.style.backgroundColor = 'rgba(50, 0, 0, 0.7)';
+                    this.style.borderColor = '#f00';
+                    this.style.color = '#f00';
+                    
+                    setTimeout(() => {
+                        this.style.backgroundColor = '';
+                        this.style.borderColor = '';
+                        this.style.color = '';
+                    }, 500);
+                });
+            }
+        });
+        
+        // Обработчик изменения размера окна
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Пересчитываем количество столбцов
+            columns = Math.floor(canvas.width / fontSize) * density;
+            
+            // Корректируем массив drops
+            if (columns > drops.length) {
+                // Добавляем новые столбцы
+                for (let i = drops.length; i < columns; i++) {
+                    drops[i] = Math.floor(Math.random() * canvas.height / fontSize) * fontSize;
+                }
+            } else if (columns < drops.length) {
+                // Удаляем лишние столбцы
+                drops.length = columns;
+            }
+        });
+        
+        // Проверяем доступность шрифтов после загрузки страницы
+        window.addEventListener('load', async function() {
+            await checkAvailableFonts();
+            
+            // Добавим эффект мигающих символов на рамке
+            const frame = document.querySelector('.frame');
+            setInterval(() => {
+                const randomSymbol = symbolsArray[Math.floor(Math.random() * symbolsArray.length)];
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                const glitch = document.createElement('div');
+                glitch.textContent = randomSymbol;
+                glitch.style.position = 'absolute';
+                glitch.style.left = `${x}%`;
+                glitch.style.top = `${y}%`;
+                glitch.style.color = colors[currentColor].main;
+                glitch.style.fontSize = `${Math.random() * 20 + 10}px`;
+                glitch.style.opacity = '0.7';
+                glitch.style.zIndex = '1';
+                glitch.style.pointerEvents = 'none';
+                glitch.style.fontFamily = `${currentFont}, 'Courier New', monospace`;
+                
+                frame.appendChild(glitch);
+                
+                setTimeout(() => {
+                    glitch.remove();
+                }, 300);
+            }, 500);
+            
+            // Периодически обновляем статус шрифта
+            setInterval(() => {
+                fontStatus.textContent = `Матрица активна. Шрифт: ${document.getElementById('fontSelect').options[document.getElementById('fontSelect').selectedIndex].textContent}, Цвет: ${colors[currentColor].name}`;
+            }, 10000);
+        });
+        
+        // Функция для загрузки дополнительных символов из файла
+        async function loadSymbolsFromFile() {
+            try {
+                // Попытка загрузить символы из текстового файла
+                const response = await fetch('/assets/data/symbols.txt');
+                if (response.ok) {
+                    const customSymbols = await response.text();
+                    if (customSymbols.trim().length > 10) { // Минимум 10 символов
+                        currentSymbolSet = customSymbols;
+                        fontStatus.textContent = 'Загружены кастомные символы из файла';
+                        return true;
+                    }
+                }
+            } catch (e) {
+                // Игнорируем ошибку, используем стандартные символы
+            }
+            return false;
+        }
+        
+        // Пытаемся загрузить символы из файла
+        loadSymbolsFromFile().then(loaded => {
+            if (loaded) {
+                console.log('Символы загружены из файла');
+            }
+        });
+    </script>
+</body>
+</html>

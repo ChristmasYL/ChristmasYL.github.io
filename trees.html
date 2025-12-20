@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Завершение путешествия | Новогодняя игра</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            min-height: 100vh;
+            overflow: auto; /* Изменил на auto для возможности скролла при необходимости */
+            position: relative;
+            background-color: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px; /* Добавил отступы по краям */
+        }
+
+        /* Фоновое фото */
+        .background-photo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/assets/img/trees.jfif') center/cover no-repeat;
+            filter: brightness(0.7) sepia(0.2) hue-rotate(-10deg);
+            z-index: -2;
+        }
+
+        /* Затемнение фона для лучшей читаемости текста */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        /* Контейнер для центрирования */
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Основное окно с текстом */
+        .text-window {
+            max-width: 800px;
+            width: 100%;
+            padding: 50px;
+            background: linear-gradient(
+                135deg,
+                rgba(120, 10, 20, 0.85) 0%,
+                rgba(160, 20, 30, 0.9) 50%,
+                rgba(120, 10, 20, 0.85) 100%
+            );
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            box-shadow: 
+                0 0 60px rgba(200, 30, 40, 0.6),
+                0 0 30px rgba(255, 50, 60, 0.4),
+                inset 0 0 0 1px rgba(255, 200, 200, 0.2);
+            border: 2px solid rgba(220, 40, 50, 0.8);
+            position: relative;
+            animation: glow 3s ease-in-out infinite alternate;
+            margin: auto; /* Центрирование по горизонтали */
+        }
+
+        /* Текст */
+        .message {
+            color: #fff0f0;
+            font-size: 26px;
+            line-height: 1.6;
+            text-align: center;
+            text-shadow: 
+                0 0 10px rgba(255, 100, 100, 0.7),
+                0 0 5px rgba(255, 50, 50, 0.5);
+            font-weight: 500;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Снежинки вокруг текста */
+        .snowflake {
+            position: absolute;
+            color: #ffcccc;
+            font-size: 24px;
+            opacity: 0.7;
+            user-select: none;
+            pointer-events: none;
+            animation: float 8s linear infinite;
+        }
+
+        /* Кнопка для открытия поля ввода кода */
+        .reveal-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 18px 45px;
+            font-size: 22px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(
+                135deg,
+                #d32f2f 0%,
+                #b71c1c 50%,
+                #d32f2f 100%
+            );
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 25px rgba(180, 30, 30, 0.6),
+                0 0 15px rgba(255, 100, 100, 0.5);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+
+        .reveal-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 12px 35px rgba(200, 40, 40, 0.8),
+                0 0 20px rgba(255, 120, 120, 0.7);
+        }
+
+        .reveal-btn:active {
+            transform: translateY(0) scale(1);
+        }
+
+        .reveal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.7s ease;
+        }
+
+        .reveal-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Контейнер для ввода кода (скрыт по умолчанию) */
+        .code-container {
+            margin-top: 40px;
+            padding: 35px;
+            background: rgba(80, 0, 10, 0.7);
+            border-radius: 15px;
+            border: 2px solid rgba(220, 60, 70, 0.6);
+            box-shadow: 
+                0 0 30px rgba(200, 30, 40, 0.5),
+                inset 0 0 20px rgba(100, 0, 10, 0.4);
+            display: none;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .code-input {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(220, 40, 50, 0.7);
+            background: rgba(20, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            letter-spacing: 3px;
+            font-weight: bold;
+            font-family: 'Cormorant Garamond', serif;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #ff5252;
+            box-shadow: 0 0 20px rgba(255, 80, 80, 0.7);
+            background: rgba(30, 0, 0, 0.9);
+        }
+
+        .code-input::placeholder {
+            color: rgba(255, 200, 200, 0.6);
+            letter-spacing: normal;
+            font-weight: normal;
+        }
+
+        /* Кнопка отправки кода */
+        .submit-btn {
+            padding: 16px 40px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(
+                135deg,
+                #388e3c 0%,
+                #2e7d32 50%,
+                #388e3c 100%
+            );
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            box-shadow: 
+                0 8px 25px rgba(50, 150, 50, 0.5),
+                0 0 10px rgba(100, 255, 100, 0.4);
+            width: 100%;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 30px rgba(60, 180, 60, 0.7),
+                0 0 15px rgba(120, 255, 120, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.7s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Сообщение об ошибке */
+        .error-message {
+            color: #ffcccc;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            display: none;
+            text-shadow: 0 0 10px rgba(255, 100, 100, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(150, 0, 0, 0.3);
+            border: 1px solid rgba(255, 100, 100, 0.5);
+            animation: shake 0.5s ease;
+        }
+
+        /* Анимации */
+        @keyframes glow {
+            0% {
+                box-shadow: 
+                    0 0 60px rgba(200, 30, 40, 0.6),
+                    0 0 30px rgba(255, 50, 60, 0.4),
+                    inset 0 0 0 1px rgba(255, 200, 200, 0.2);
+            }
+            100% {
+                box-shadow: 
+                    0 0 70px rgba(220, 50, 60, 0.8),
+                    0 0 40px rgba(255, 80, 90, 0.6),
+                    inset 0 0 0 1px rgba(255, 220, 220, 0.3);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .text-window {
+                padding: 30px;
+                margin: 15px;
+            }
+            
+            .message {
+                font-size: 22px;
+            }
+            
+            .reveal-btn {
+                padding: 15px 35px;
+                font-size: 20px;
+            }
+            
+            .code-input {
+                padding: 15px;
+                font-size: 18px;
+            }
+            
+            .submit-btn {
+                padding: 14px 30px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .message {
+                font-size: 20px;
+            }
+            
+            .text-window {
+                padding: 25px 20px;
+            }
+            
+            .reveal-btn {
+                padding: 14px 30px;
+                font-size: 18px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Фоновое фото -->
+    <div class="background-photo"></div>
+    
+    <!-- Затемнение -->
+    <div class="overlay"></div>
+    
+    <!-- Контейнер для центрирования -->
+    <div class="container">
+        <!-- Основное окно с текстом -->
+        <div class="text-window">
+            <!-- Снежинки -->
+            <div class="snowflake" style="top: 10%; left: 5%;">❄️</div>
+            <div class="snowflake" style="top: 5%; left: 15%; animation-delay: -2s;">❄️</div>
+            <div class="snowflake" style="top: 15%; right: 10%; animation-delay: -4s;">❄️</div>
+            <div class="snowflake" style="bottom: 20%; left: 10%; animation-delay: -1s;">❄️</div>
+            <div class="snowflake" style="bottom: 10%; right: 15%; animation-delay: -3s;">❄️</div>
+            
+            <!-- Текст сообщения -->
+            <div class="message">
+                Ну вот и подходит путешествие к концу!<br><br>
+                Подарок как и следует ему быть под елкой.<br><br>
+                Найди его и введи последний код, чтобы закончить игру😉
+            </div>
+            
+            <!-- Кнопка для открытия поля ввода кода -->
+            <button class="reveal-btn" id="revealBtn">В последний путь</button>
+            
+            <!-- Контейнер для ввода кода -->
+            <div class="code-container" id="codeContainer">
+                <input type="text" class="code-input" id="codeInput" placeholder="Введите последний код" maxlength="20">
+                <button class="submit-btn" id="submitBtn">Проверить код</button>
+                <div class="error-message" id="errorMessage">Неверный код! Попробуйте еще раз.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const revealBtn = document.getElementById('revealBtn');
+            const codeContainer = document.getElementById('codeContainer');
+            const codeInput = document.getElementById('codeInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Правильный код (измените на свой)
+            const CORRECT_CODE = "61239";
+            
+            // При клике на кнопку "В последний путь" показываем поле ввода кода
+            revealBtn.addEventListener('click', function() {
+                codeContainer.style.display = 'block';
+                codeInput.focus();
+                
+                // Анимация кнопки
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+            
+            // Проверка кода при нажатии на кнопку "Проверить код"
+            submitBtn.addEventListener('click', function() {
+                const enteredCode = codeInput.value.trim();
+                
+                if (!enteredCode) {
+                    showError("Пожалуйста, введите код");
+                    return;
+                }
+                
+                if (enteredCode.toUpperCase() === CORRECT_CODE) {
+                    // Успех - меняем стиль кнопки
+                    this.innerHTML = "✓ Код принят!";
+                    this.style.background = 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 50%, #4CAF50 100%)';
+                    this.style.boxShadow = '0 8px 25px rgba(76, 175, 80, 0.6), 0 0 15px rgba(100, 255, 100, 0.5)';
+                    
+                    // Перенаправляем на последнюю страницу через 1.5 секунды
+                    setTimeout(() => {
+                        window.location.href = "final.html"; // Замените на адрес вашей последней страницы
+                    }, 1500);
+                } else {
+                    showError("Неверный код! Попробуйте еще раз.");
+                    
+                    // Анимация ошибки
+                    codeContainer.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        codeContainer.style.animation = '';
+                    }, 500);
+                    
+                    // Очищаем поле ввода
+                    codeInput.value = '';
+                    codeInput.focus();
+                }
+            });
+            
+            // Проверка кода по нажатию Enter
+            codeInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    submitBtn.click();
+                }
+            });
+            
+            // Функция для отображения ошибки
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                
+                // Скрываем сообщение через 5 секунд
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Создаем дополнительные снежинки
+            function createSnowflakes() {
+                const textWindow = document.querySelector('.text-window');
+                const snowflakeCount = 15;
+                
+                for (let i = 0; i < snowflakeCount; i++) {
+                    const snowflake = document.createElement('div');
+                    snowflake.classList.add('snowflake');
+                    snowflake.textContent = '❄️';
+                    
+                    // Случайные позиции
+                    const left = Math.random() * 90 + 5;
+                    const top = Math.random() * 90 + 5;
+                    const size = Math.random() * 20 + 16;
+                    const duration = Math.random() * 10 + 8;
+                    const delay = Math.random() * -10;
+                    
+                    snowflake.style.left = `${left}%`;
+                    snowflake.style.top = `${top}%`;
+                    snowflake.style.fontSize = `${size}px`;
+                    snowflake.style.animationDuration = `${duration}s`;
+                    snowflake.style.animationDelay = `${delay}s`;
+                    
+                    textWindow.appendChild(snowflake);
+                }
+            }
+            
+            // Создаем снежинки после загрузки
+            setTimeout(createSnowflakes, 500);
+        });
+    </script>
+</body>
+</html>

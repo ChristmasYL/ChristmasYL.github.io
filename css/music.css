@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: "music";
+    src: url('/assets/fonts/music.ttf') format('truetype');
+    font-weight: normal;
+ /* normal */
+    font-style: normal;
+    font-display: swap;
+}
+/* Фон */
+.background {
+    position: fixed;
+    inset: 0;
+    background: url("/assets/img/music.jpg") center / cover no-repeat;
+    filter: brightness(0.6);
+    z-index: -2;
+}
+
+/* Затемнение */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Контент */
+.content {
+    max-width: 700px;
+    padding: 25px 25px;
+    background: rgba(15, 15, 20, 0.15);
+    border-radius: 22px;
+    backdrop-filter: blur(3px);
+    box-shadow: 0 0 50px rgba(255, 215, 120, 0.15);
+}
+
+/* Текст */
+.content p {
+    font-family: "music";
+    color: #f2e8d8;
+    font-size: 22px;
+    line-height: 1.2;
+    text-shadow: 0 0 12px rgba(255, 220, 160, 0.25);
+}
+
+/* Кнопка */
+.open-modal {
+    margin-top: 35px;
+    padding: 14px 34px;
+    font-size: 20px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ffcc66, #ff9966);
+    color: #2a1b0f;
+    font-weight: 600;
+    animation: pulse 2.8s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 10px rgba(255,180,80,0.4); }
+    50% { box-shadow: 0 0 28px rgba(255,210,120,0.9); }
+    100% { box-shadow: 0 0 10px rgba(255,180,80,0.4); }
+}
+
+/* Модалка */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: rgba(25,25,30,0.95);
+    padding: 35px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 200, 120, 0.25);
+}
+
+.modal-content h2 {
+    color: #ffe2b0;
+    margin-bottom: 20px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.modal-buttons button {
+    padding: 10px 22px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #ffb347;
+}
+
+.modal-buttons .close {
+    background: #777;
+    color: #fff;
+}

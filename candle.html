@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candle</title>
+
+    <style>
+        @font-face {
+    font-family: "Christmas";
+    src: url('/assets/fonts/fire.otf') format('opentype');
+    font-weight: 4836; /* normal */
+    font-style: normal;
+    font-display: swap;
+}
+
+    </style>
+    <link rel="stylesheet" href="css/candle.css">
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="container">
+    <div class="card">
+        <p>
+            Браво, ты хорошо справляешься, тогда идем дальше!<br><br>
+
+            Помимо ели, какая еще ассоциация возникает у тебя при упоминании рождества?<br><br>
+            
+            Лично у меня это камин, либо костер.<br>
+
+            Новогодние носки развешанные у камина, подсвечники и ...<br><br>
+            Догадавшись что это, ты найдешь следующее послание😉
+        </p>
+
+        <p class="hint">Подсказка: Ищи напротив</p>
+
+        <button id="openCode">Продолжить</button>
+
+        <div class="code-box" id="codeBox">
+            <input type="text" id="codeInput" placeholder="Введите код">
+            <button id="checkCode">Ок</button>
+            <p class="error" id="errorText">Неверный код</p>
+        </div>
+    </div>
+</div>
+
+<script src="js/candle.js"></script>
+</body>
+</html>

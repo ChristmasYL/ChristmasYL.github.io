@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Музыка</title>
+
+    <!-- Шрифт -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/music.css">
+</head>
+<body>
+
+<div class="background"></div>
+
+<div class="overlay">
+    <div class="content">
+        <p>
+            Ты почти у финиша. Знаешь, мы все разные, но есть то, что нас объединяет.<br><br>
+
+            Я лично считаю, что нет людей равнодушных к музыке.<br><br>
+
+            Мы все ее любим, и поэтому именно туда лежит твоя дорога.<br><br>
+
+            Сегодня были прекрасные песни, но кажется, в них не хватало некого хлопка.<br><br>
+
+            Так вот тебе предстоит сделать этот завершающий хлопок...
+        </p>
+
+        <button class="open-modal" onclick="openModal()">Сделать хлопок</button>
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <h2>Введите код</h2>
+        <input type="password" id="codeInput" placeholder="Код">
+        <div class="modal-buttons">
+            <button onclick="checkCode()">Продолжить</button>
+            <button class="close" onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/music.js"></script>
+</body>
+</html>

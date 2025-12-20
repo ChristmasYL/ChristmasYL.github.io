@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Начало путешествия</title>
+
+<style>
+        /* Подключаем кастомный шрифт */
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('/assets/fonts/tree.ttf') format('truetype');
+            font-weight: 60;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('/assets/fonts/tree.ttf') format('truetype');
+            font-weight: 96;
+            font-style: normal;
+        }
+
+    </style>
+
+    <!-- ОБЯЗАТЕЛЬНО для мобильных -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/css/way.css">
+</head>
+<body>
+
+    <!-- Контейнер для снежинок - ОБЯЗАТЕЛЬНО ДОБАВЬТЕ ЭТОТ ДИВ! -->
+    <div id="snow"></div>
+
+    <div class="overlay">
+        <div class="card">
+            <p>
+                Ну что же юный следопыт, ты первом шаге от подарка!<br><br>
+
+                Твоя задача сейчас раздать конверты участникам команды,  
+                на каждом несколько вариантов, кому ты можешь их отдать,  
+                они пригодятся в будущем.<br><br>
+
+                Ну а сейчас мы начинаем путешествие и погружение  
+                в рождественское настроение.<br><br>
+
+                Все мы любим играть,  
+                и твоя игра начинается сейчас!
+            </p>
+
+            <button onclick="start()">Идем дальше!</button>
+        
+        </div>
+    </div>
+</body>
+
+<body>
+   <script src="js/snow.js"></script>
+
+</body>
+
+</html>
